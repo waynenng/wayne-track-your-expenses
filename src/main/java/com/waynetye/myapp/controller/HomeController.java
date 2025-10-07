@@ -1,4 +1,4 @@
-package com.waynetye.myapp;
+package com.waynetye.myapp.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
