@@ -3,6 +3,7 @@ package com.waynetye.myapp.controller;
 import com.waynetye.myapp.model.User;
 import com.waynetye.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; // ✅ inject BCrypt encoder
 
     // ✅ 1. Get all users
     @GetMapping
@@ -31,6 +35,8 @@ public class UserController {
     // ✅ 3. Create a new user (generic)
     @PostMapping
     public User createUser(@RequestBody User user) {
+        // Encrypt password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -42,7 +48,8 @@ public class UserController {
                     user.setFirstName(userDetails.getFirstName());
                     user.setLastName(userDetails.getLastName());
                     user.setEmail(userDetails.getEmail());
-                    user.setPassword(userDetails.getPassword());
+                    // Encrypt new password before saving
+                    user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -60,16 +67,30 @@ public class UserController {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return "Error: Email already registered!";
         }
+
+        // Encrypt password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         userRepository.save(user);
         return "User registered successfully!";
     }
 
-    // ✅ 7. Login user
+    // ✅ 7. Login user (BCrypt password comparison)
     @PostMapping("/login")
     public String loginUser(@RequestBody User loginData) {
-        return userRepository.findByEmail(loginData.getEmail())
-                .filter(user -> user.getPassword().equals(loginData.getPassword()))
-                .map(user -> "Login successful!")
-                .orElse("Error: Invalid email or password!");
+        Optional<User> existingUser = userRepository.findByEmail(loginData.getEmail());
+
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+
+            // Compare raw password with hashed password
+            if (passwordEncoder.matches(loginData.getPassword(), user.getPassword())) {
+                return "Login successful!";
+            } else {
+                return "Error: Invalid email or password!";
+            }
+        } else {
+            return "Error: Invalid email or password!";
+        }
     }
 }
