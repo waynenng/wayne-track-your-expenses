@@ -1,12 +1,17 @@
 package com.waynetye.myapp.controller;
 
 import com.waynetye.myapp.model.User;
+import com.waynetye.myapp.model.Month;
 import com.waynetye.myapp.repository.UserRepository;
+import com.waynetye.myapp.repository.MonthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -16,6 +21,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MonthRepository monthRepository; // ✅ inject Month repository
 
     @Autowired
     private PasswordEncoder passwordEncoder; // ✅ inject BCrypt encoder
@@ -61,7 +69,7 @@ public class UserController {
         userRepository.deleteById(id);
     }
 
-    // ✅ 6. Register user (email must be unique)
+    // ✅ 6. Register user (email must be unique + create current month)
     @PostMapping("/register")
     public String registerUser(@RequestBody User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
@@ -70,9 +78,17 @@ public class UserController {
 
         // Encrypt password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User savedUser = userRepository.save(user);
 
-        userRepository.save(user);
-        return "User registered successfully!";
+        // Automatically create current month for the new user
+        LocalDate today = LocalDate.now();
+        String monthName = today.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        int year = today.getYear();
+
+        Month firstMonth = new Month(monthName, year, savedUser.getId());
+        monthRepository.save(firstMonth);
+
+        return "User registered successfully with current month created!";
     }
 
     // ✅ 7. Login user (BCrypt password comparison)
