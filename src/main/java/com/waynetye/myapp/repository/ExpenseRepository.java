@@ -11,6 +11,9 @@ public interface ExpenseRepository extends MongoRepository<Expense, String> {
     // Find all expenses belonging to a specific month
     List<Expense> findByMonthId(String monthId);
 
-    // Optional: find expenses by category within a month
-    List<Expense> findByMonthIdAndCategory(String monthId, String category);
+    // Find expenses by month and category
+    List<Expense> findByMonthIdAndCategoryId(String monthId, String categoryId);
+
+    // Find all expenses belonging to a specific category
+    List<Expense> findByCategoryId(String categoryId);
 }
