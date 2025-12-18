@@ -1,8 +1,25 @@
 <h2>Login</h2>
 
-<input type="email" [(ngModel)]="email" placeholder="Email" />
-<input type="password" [(ngModel)]="password" placeholder="Password" />
+<form (ngSubmit)="onLogin()">
 
-<button (click)="onLogin()">Login</button>
+  <input
+    type="email"
+    [(ngModel)]="email"
+    name="email"
+    placeholder="Email"
+  />
 
-<p style="color:red" *ngIf="error">{{ error }}</p>
+  <input
+    type="password"
+    [(ngModel)]="password"
+    name="password"
+    placeholder="Password"
+  />
+
+  <button type="submit">Login</button>
+
+</form>
+
+<p *ngIf="error" style="color: red; margin-top: 10px;">
+  {{ error }}
+</p>

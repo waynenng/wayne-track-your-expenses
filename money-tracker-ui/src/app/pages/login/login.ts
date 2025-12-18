@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-login',
@@ -18,7 +20,8 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   onLogin() {
@@ -26,18 +29,19 @@ export class LoginComponent {
 
     if (!this.email || !this.password) {
       this.error = 'Email and password are required';
+      this.cdr.detectChanges();
       return;
     }
 
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        // ✅ login success
         this.router.navigate(['/home']);
       },
-      error: () => {
-        // ❌ login failed
-        this.error = 'Invalid email or password';
+      error: (err) => {
+        this.error = err?.error || 'Invalid email or password';
+        this.cdr.detectChanges(); // ✅ FORCE VIEW UPDATE
       }
     });
   }
+
 }
