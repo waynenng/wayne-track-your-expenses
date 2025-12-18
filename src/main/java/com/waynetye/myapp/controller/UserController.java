@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*") // allows access from frontend apps
@@ -93,20 +97,18 @@ public class UserController {
 
     // ✅ 7. Login user (BCrypt password comparison)
     @PostMapping("/login")
-    public String loginUser(@RequestBody User loginData) {
+    public ResponseEntity<String> loginUser(@RequestBody User loginData) {
         Optional<User> existingUser = userRepository.findByEmail(loginData.getEmail());
 
         if (existingUser.isPresent()) {
             User user = existingUser.get();
 
-            // Compare raw password with hashed password
             if (passwordEncoder.matches(loginData.getPassword(), user.getPassword())) {
-                return "Login successful!";
-            } else {
-                return "Error: Invalid email or password!";
+                return ResponseEntity.ok("Login successful");
             }
-        } else {
-            return "Error: Invalid email or password!";
         }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Invalid email or password");
     }
 }

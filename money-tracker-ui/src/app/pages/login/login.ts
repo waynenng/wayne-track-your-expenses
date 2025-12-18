@@ -1,24 +1,43 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrls: ['./login.css']
 })
-export class Login {
+export class LoginComponent {
 
   email = '';
   password = '';
+  error = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  login() {
-    // TEMP: just navigate to home for now
-    console.log(this.email, this.password);
-    this.router.navigate(['/home']);
+  onLogin() {
+    this.error = '';
+
+    if (!this.email || !this.password) {
+      this.error = 'Email and password are required';
+      return;
+    }
+
+    this.authService.login(this.email, this.password).subscribe({
+      next: () => {
+        // ✅ login success
+        this.router.navigate(['/home']);
+      },
+      error: () => {
+        // ❌ login failed
+        this.error = 'Invalid email or password';
+      }
+    });
   }
 }
