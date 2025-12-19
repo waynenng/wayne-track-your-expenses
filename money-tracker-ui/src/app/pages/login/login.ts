@@ -39,7 +39,7 @@ export class LoginComponent {
       },
       error: (err) => {
         this.error = err?.error || 'Invalid email or password';
-        this.cdr.detectChanges(); // ✅ FORCE VIEW UPDATE
+        this.cdr.detectChanges();
       }
     });
   }
