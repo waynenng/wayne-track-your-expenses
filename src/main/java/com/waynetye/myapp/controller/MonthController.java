@@ -5,51 +5,53 @@ import com.waynetye.myapp.repository.MonthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/months")
-@CrossOrigin(origins = "*") // allow access from frontend
+@CrossOrigin(origins = "*")
 public class MonthController {
 
     @Autowired
     private MonthRepository monthRepository;
 
-    // ✅ 1. Get all months
-    @GetMapping
-    public List<Month> getAllMonths() {
-        return monthRepository.findAll();
+    /**
+     * ✅ Get all months for a user (chronologically ordered)
+     * This is what the Home UI will call.
+     */
+    @GetMapping("/by-user")
+    public List<Month> getMonthsByUser(@RequestParam String userId) {
+        ensureCurrentMonthExists(userId);
+        return monthRepository.findByUserIdOrderByYearAscMonthAsc(userId);
     }
 
-    // ✅ 2. Get month by ID
+    /**
+     * ✅ (Optional) Get a month by ID
+     * Useful for expense views
+     */
     @GetMapping("/{id}")
-    public Optional<Month> getMonthById(@PathVariable String id) {
-        return monthRepository.findById(id);
-    }
-
-    // ✅ 3. Create a new month
-    @PostMapping
-    public Month createMonth(@RequestBody Month month) {
-        return monthRepository.save(month);
-    }
-
-    // ✅ 4. Update month
-    @PutMapping("/{id}")
-    public Month updateMonth(@PathVariable String id, @RequestBody Month monthDetails) {
+    public Month getMonthById(@PathVariable String id) {
         return monthRepository.findById(id)
-                .map(month -> {
-                    month.setName(monthDetails.getName());
-                    month.setYear(monthDetails.getYear());
-                    // Optional: add other updates like linked expenses if needed
-                    return monthRepository.save(month);
-                })
                 .orElseThrow(() -> new RuntimeException("Month not found"));
     }
 
-    // ✅ 5. Delete month
-    @DeleteMapping("/{id}")
-    public void deleteMonth(@PathVariable String id) {
-        monthRepository.deleteById(id);
+    /**
+     * 🔒 INTERNAL SYSTEM LOGIC
+     * Ensures the current calendar month exists for the user.
+     */
+    private void ensureCurrentMonthExists(String userId) {
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        int month = now.getMonthValue(); // 1–12
+
+        boolean exists = monthRepository
+                .findByUserIdAndYearAndMonth(userId, year, month)
+                .isPresent();
+
+        if (!exists) {
+            Month newMonth = new Month(year, month, userId);
+            monthRepository.save(newMonth);
+        }
     }
 }

@@ -75,24 +75,21 @@ public class UserController {
 
     // ✅ 6. Register user (email must be unique + create current month)
     @PostMapping("/register")
-    public String registerUser(@RequestBody User user) {
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return "Error: Email already registered!";
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Email already registered");
         }
 
         // Encrypt password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
 
-        // Automatically create current month for the new user
-        LocalDate today = LocalDate.now();
-        String monthName = today.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        int year = today.getYear();
+        // ❌ Do NOT create month here
+        // MonthController will ensure current month exists
 
-        Month firstMonth = new Month(monthName, year, savedUser.getId());
-        monthRepository.save(firstMonth);
-
-        return "User registered successfully with current month created!";
+        return ResponseEntity.ok("User registered successfully");
     }
 
     // ✅ 7. Login user (BCrypt password comparison)
