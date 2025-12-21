@@ -5,5 +5,10 @@ import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
-  { path: 'home', component: HomeComponent, canActivate: [authGuard] }
+  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
+  {
+    path: 'month/:id',
+    loadComponent: () =>
+      import('./pages/month/month').then(m => m.MonthComponent)
+  }
 ];

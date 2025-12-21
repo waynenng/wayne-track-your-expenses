@@ -1,5 +1,19 @@
-<h2>Home</h2>
+<h2>Your Months</h2>
 
-<p>Welcome! You are logged in.</p>
+@if (months.length === 0) {
+<p>No months found.</p>
+} @else {
+<div class="months">
+  @for (m of months; track m.id) {
+  <div
+    class="month-card"
+    (click)="openMonth(m)"
+    style="cursor:pointer; border:1px solid #ccc; padding:12px; margin-bottom:10px;"
+  >
+    <h3>{{ getMonthName(m.month) }} {{ m.year }}</h3>
+  </div>
+  }
+</div>
+}
 
 <button (click)="logout()">Logout</button>

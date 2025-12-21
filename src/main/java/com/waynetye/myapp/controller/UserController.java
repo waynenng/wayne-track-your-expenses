@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -94,14 +95,19 @@ public class UserController {
 
     // ✅ 7. Login user (BCrypt password comparison)
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User loginData) {
+    public ResponseEntity<?> loginUser(@RequestBody User loginData) {
         Optional<User> existingUser = userRepository.findByEmail(loginData.getEmail());
 
         if (existingUser.isPresent()) {
             User user = existingUser.get();
 
             if (passwordEncoder.matches(loginData.getPassword(), user.getPassword())) {
-                return ResponseEntity.ok("Login successful");
+                return ResponseEntity.ok(
+                        Map.of(
+                                "userId", user.getId(),
+                                "message", "Login successful"
+                        )
+                );
             }
         }
 

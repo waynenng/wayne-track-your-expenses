@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -11,27 +13,33 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // 🔐 LOGIN
-  login(email: string, password: string): Observable<any> {
-    return this.http.post(
+  login(email: string, password: string) {
+    return this.http.post<any>(
       `${this.API_URL}/login`,
-      { email, password },
-      { responseType: 'text' }
-    ).pipe(
-      tap(() => {
-        // ✅ persist login state
-        localStorage.setItem('loggedIn', 'true');
-      })
+      { email, password }
     );
   }
 
-  // 🔓 LOGOUT
   logout() {
-    localStorage.removeItem('loggedIn');
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+    }
   }
 
-  // ❓ CHECK LOGIN STATUS
   isLoggedIn(): boolean {
+    if (typeof window === 'undefined') return false;
     return localStorage.getItem('loggedIn') === 'true';
+  }
+
+  setUser(userId: string) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('loggedIn', 'true');
+      localStorage.setItem('userId', userId);
+    }
+  }
+
+  getUserId(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('userId');
   }
 }

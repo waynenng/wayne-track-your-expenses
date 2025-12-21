@@ -1,6 +1,5 @@
-import { CanActivateFn } from '@angular/router';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
@@ -11,7 +10,6 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
-  // ❌ not logged in → redirect to login
   router.navigate(['/']);
   return false;
 };
