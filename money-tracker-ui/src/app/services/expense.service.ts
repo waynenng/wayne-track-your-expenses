@@ -8,6 +8,7 @@ export interface Expense {
   categoryId: string;
   amount: number;
   description: string;
+  date: string;
 }
 
 @Injectable({ providedIn: 'root' })

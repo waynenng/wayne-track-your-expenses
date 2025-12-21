@@ -11,6 +11,7 @@
 <table *ngIf="expenses.length > 0; else empty" border="1" cellpadding="8">
   <thead>
   <tr>
+    <th>Date</th>
     <th>Description</th>
     <th>Amount</th>
   </tr>
@@ -18,10 +19,9 @@
 
   <tbody>
   <tr *ngFor="let e of expenses">
+    <td>{{ e.date | date:'dd MMM yyyy' }}</td>
     <td>{{ e.description }}</td>
-    <td>
-      {{ currency }} {{ e.amount | number:'1.2-2' }}
-    </td>
+    <td>{{ currency }} {{ e.amount | number:'1.2-2' }}</td>
   </tr>
   </tbody>
 </table>

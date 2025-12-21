@@ -5,6 +5,7 @@ import com.waynetye.myapp.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,12 @@ public class ExpenseController {
     // ✅ 3. Create a new expense
     @PostMapping
     public Expense createExpense(@RequestBody Expense expense) {
+
+        // ✅ Default date if not provided
+        if (expense.getDate() == null) {
+            expense.setDate(LocalDate.now());
+        }
+
         return expenseRepository.save(expense);
     }
 

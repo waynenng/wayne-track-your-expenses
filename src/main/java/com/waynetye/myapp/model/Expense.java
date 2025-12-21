@@ -3,6 +3,8 @@ package com.waynetye.myapp.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+
 @Document(collection = "expenses")
 public class Expense {
 
@@ -12,6 +14,7 @@ public class Expense {
     private String categoryId;  // Reference to the Category
     private double amount;      // Expense amount
     private String description; // Optional description of the expense
+    private LocalDate date;
 
     // Default constructor
     public Expense() {}
@@ -38,4 +41,7 @@ public class Expense {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
 }
