@@ -1,12 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExpenseService, Expense } from '../../services/expense.service';
 
 @Component({
   selector: 'app-month',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './month.html',
 })
 export class MonthComponent implements OnInit {
@@ -14,11 +15,14 @@ export class MonthComponent implements OnInit {
   expenses: Expense[] = [];
   monthId!: string;
 
+  // ✅ default currency
+  currency: 'RM' | '$' = 'RM';
+
   constructor(
     private route: ActivatedRoute,
     private expenseService: ExpenseService,
     private router: Router,
-    private cdr: ChangeDetectorRef   // 👈 IMPORTANT
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -29,9 +33,8 @@ export class MonthComponent implements OnInit {
   loadExpenses() {
     this.expenseService.getExpensesByMonth(this.monthId).subscribe({
       next: (data) => {
-        console.log('Expenses from backend:', data); // 🔍 MUST log
         this.expenses = data;
-        this.cdr.detectChanges(); // 🔥 FORCE render
+        this.cdr.detectChanges();
       },
       error: (err) => console.error(err)
     });

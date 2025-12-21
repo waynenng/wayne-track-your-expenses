@@ -1,10 +1,30 @@
 <h2>Expenses</h2>
 
-<ul *ngIf="expenses.length > 0; else empty">
-  <li *ngFor="let e of expenses">
-    <strong>{{ e.amount }}</strong> — {{ e.description }}
-  </li>
-</ul>
+<label>
+  Currency:
+  <select [(ngModel)]="currency">
+    <option value="RM">RM</option>
+    <option value="$">$</option>
+  </select>
+</label>
+
+<table *ngIf="expenses.length > 0; else empty" border="1" cellpadding="8">
+  <thead>
+  <tr>
+    <th>Description</th>
+    <th>Amount</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr *ngFor="let e of expenses">
+    <td>{{ e.description }}</td>
+    <td>
+      {{ currency }} {{ e.amount | number:'1.2-2' }}
+    </td>
+  </tr>
+  </tbody>
+</table>
 
 <ng-template #empty>
   <p>No expenses found.</p>
