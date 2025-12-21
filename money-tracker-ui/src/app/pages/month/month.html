@@ -1,5 +1,13 @@
-<h2>Month Details</h2>
+<h2>Expenses</h2>
 
-<p>Month ID: {{ monthId }}</p>
+<ul *ngIf="expenses.length > 0; else empty">
+  <li *ngFor="let e of expenses">
+    <strong>{{ e.amount }}</strong> — {{ e.description }}
+  </li>
+</ul>
 
-<button (click)="back()">Back</button>
+<ng-template #empty>
+  <p>No expenses found.</p>
+</ng-template>
+
+<button (click)="back()">← Back</button>

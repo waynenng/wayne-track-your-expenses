@@ -9,6 +9,7 @@ export const routes: Routes = [
   {
     path: 'month/:id',
     loadComponent: () =>
-      import('./pages/month/month').then(m => m.MonthComponent)
+      import('./pages/month/month').then(m => m.MonthComponent),
+      canActivate: [authGuard]
   }
 ];
