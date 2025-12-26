@@ -1,45 +1,43 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID } from '@angular/core';
+import { BehaviorSubject, tap } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 
   private API_URL = 'http://localhost:8080/api/users';
 
-  constructor(private http: HttpClient) {}
+  private loggedIn$ = new BehaviorSubject<boolean>(false);
+
+  constructor(private http: HttpClient) {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('loggedIn') === 'true';
+      this.loggedIn$.next(stored);
+    }
+  }
 
   login(email: string, password: string) {
-    return this.http.post<any>(
-      `${this.API_URL}/login`,
-      { email, password }
-    );
+    return this.http.post<any>(`${this.API_URL}/login`, { email, password })
+      .pipe(
+        tap(res => {
+          localStorage.setItem('loggedIn', 'true');
+          localStorage.setItem('userId', res.userId);
+          this.loggedIn$.next(true);
+        })
+      );
   }
 
   logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.clear();
-    }
+    localStorage.clear();
+    this.loggedIn$.next(false);
   }
 
-  isLoggedIn(): boolean {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('loggedIn') === 'true';
-  }
-
-  setUser(userId: string) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('loggedIn', 'true');
-      localStorage.setItem('userId', userId);
-    }
+  // 🔑 THIS is what guards will use
+  authState$() {
+    return this.loggedIn$.asObservable();
   }
 
   getUserId(): string | null {
-    if (typeof window === 'undefined') return null;
     return localStorage.getItem('userId');
   }
 }

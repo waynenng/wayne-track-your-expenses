@@ -24,15 +24,14 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = this.authService.getUserId();
+    const userId = this.authService.getUserId();
 
-    if (!id) {
-      // safety fallback
+    if (!userId) {
       this.router.navigate(['/']);
       return;
     }
 
-    this.userId = id;
+    this.userId = userId;
     this.loadMonths();
   }
 

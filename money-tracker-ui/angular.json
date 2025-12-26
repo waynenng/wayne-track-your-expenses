@@ -5,11 +5,9 @@
     "packageManager": "npm",
     "analytics": "db8f2b0d-2bff-4f66-b348-77c98eed5dd1"
   },
-  "newProjectRoot": "projects",
   "projects": {
     "money-tracker-ui": {
       "projectType": "application",
-      "schematics": {},
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -27,12 +25,7 @@
             ],
             "styles": [
               "src/styles.css"
-            ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
@@ -56,16 +49,16 @@
               "sourceMap": true
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "money-tracker-ui:build:production"
-            },
             "development": {
               "buildTarget": "money-tracker-ui:build:development"
+            },
+            "production": {
+              "buildTarget": "money-tracker-ui:build:production"
             }
           },
           "defaultConfiguration": "development"
