@@ -41,19 +41,19 @@ export class MonthComponent implements OnInit {
     this.loadCategories();
   }
 
-  // ✅ reactive expenses
   loadExpenses() {
     this.expenseService.getExpensesByMonth(this.monthId).subscribe({
       next: (data) => {
-        this.expenses = data;
+        this.expenses = [...data].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
 
-        // 🔑 FORCE Angular to update immediately
-        this.cdr.markForCheck();
-        this.cdr.detectChanges();
+        this.cdr.markForCheck(); // 🔥 FORCE UI UPDATE
       },
-      error: err => console.error(err)
+      error: (err) => console.error(err)
     });
   }
+
 
 
   getCategoryName(categoryId: string): string {
@@ -93,15 +93,24 @@ export class MonthComponent implements OnInit {
     };
 
     this.expenseService.addExpense(expense).subscribe({
-      next: () => {
+      next: (savedExpense) => {
+
+        this.expenses = [
+          savedExpense,
+          ...this.expenses
+        ].sort((a, b) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        this.cdr.markForCheck(); // 🔥 FORCE UI UPDATE
+
         this.amount = 0;
         this.description = '';
         this.date = new Date().toISOString().substring(0, 10);
-
-        this.loadExpenses(); // loadExpenses already forces change detection
       },
-      error: err => console.error('Failed to add expense', err)
+      error: err => console.error(err)
     });
+
   }
 
 
