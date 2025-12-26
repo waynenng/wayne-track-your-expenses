@@ -49,11 +49,7 @@
 </form>
 
 <!-- 📊 Expenses Table (FIXED: reactive + async pipe) -->
-<table
-  *ngIf="expenses$ | async as expenses; else empty"
-  border="1"
-  cellpadding="8"
->
+<table *ngIf="expenses.length > 0; else empty" border="1" cellpadding="8">
   <thead>
   <tr>
     <th>Date</th>

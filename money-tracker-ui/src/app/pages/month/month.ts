@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +15,7 @@ import { CategoryService, Category } from '../../services/category.service';
 })
 export class MonthComponent implements OnInit {
 
-  expenses$!: Observable<Expense[]>;
+  expenses: Expense[] = [];
   categories: Category[] = [];
 
   monthId!: string;
@@ -31,7 +31,8 @@ export class MonthComponent implements OnInit {
     private route: ActivatedRoute,
     private expenseService: ExpenseService,
     private categoryService: CategoryService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -42,8 +43,18 @@ export class MonthComponent implements OnInit {
 
   // ✅ reactive expenses
   loadExpenses() {
-    this.expenses$ = this.expenseService.getExpensesByMonth(this.monthId);
+    this.expenseService.getExpensesByMonth(this.monthId).subscribe({
+      next: (data) => {
+        this.expenses = data;
+
+        // 🔑 FORCE Angular to update immediately
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      },
+      error: err => console.error(err)
+    });
   }
+
 
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(c => c.id === categoryId);
@@ -69,7 +80,9 @@ export class MonthComponent implements OnInit {
       !this.description.trim() ||
       !this.categoryId ||
       !this.date
-    ) return;
+    ) {
+      return;
+    }
 
     const expense: Expense = {
       monthId: this.monthId,
@@ -85,12 +98,13 @@ export class MonthComponent implements OnInit {
         this.description = '';
         this.date = new Date().toISOString().substring(0, 10);
 
-        // 🔥 this now refreshes instantly
-        this.loadExpenses();
+        this.loadExpenses(); // loadExpenses already forces change detection
       },
       error: err => console.error('Failed to add expense', err)
     });
   }
+
+
 
   back() {
     this.router.navigate(['/home']);
