@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { ExpenseService, Expense } from '../../services/expense.service';
 import { CategoryService, Category } from '../../services/category.service';
@@ -14,15 +15,13 @@ import { CategoryService, Category } from '../../services/category.service';
 })
 export class MonthComponent implements OnInit {
 
-  expenses: Expense[] = [];
+  expenses$!: Observable<Expense[]>;
   categories: Category[] = [];
 
   monthId!: string;
 
-  // ✅ default currency
   currency: 'RM' | '$' = 'RM';
 
-  // ➕ form fields
   amount!: number;
   description = '';
   date = new Date().toISOString().substring(0, 10);
@@ -41,41 +40,36 @@ export class MonthComponent implements OnInit {
     this.loadCategories();
   }
 
-  // 📥 Expenses
+  // ✅ reactive expenses
   loadExpenses() {
-    this.expenseService.getExpensesByMonth(this.monthId).subscribe({
-      next: (data) => {
-        this.expenses = data;
-      },
-      error: (err) => console.error(err)
-    });
+    this.expenses$ = this.expenseService.getExpensesByMonth(this.monthId);
   }
 
-  // 📥 Categories
+  getCategoryName(categoryId: string): string {
+    const category = this.categories.find(c => c.id === categoryId);
+    return category ? category.name : '—';
+  }
+
   loadCategories() {
     this.categoryService.getCategories().subscribe({
       next: (data) => {
         this.categories = data;
         if (data.length > 0) {
-          this.categoryId = data[0].id; // default
+          this.categoryId = data[0].id;
         }
       },
       error: err => console.error('Failed to load categories', err)
     });
   }
 
-  // ➕ Add expense
   addExpense() {
-    // ✅ basic validation
     if (
       !this.amount ||
       this.amount <= 0 ||
-      !this.description?.trim() ||
+      !this.description.trim() ||
       !this.categoryId ||
       !this.date
-    ) {
-      return;
-    }
+    ) return;
 
     const expense: Expense = {
       monthId: this.monthId,
@@ -87,18 +81,14 @@ export class MonthComponent implements OnInit {
 
     this.expenseService.addExpense(expense).subscribe({
       next: () => {
-        // ✅ reset form cleanly
         this.amount = 0;
         this.description = '';
-        this.categoryId = '';
-        this.date = '';
+        this.date = new Date().toISOString().substring(0, 10);
 
-        // ✅ reload from backend (important)
+        // 🔥 this now refreshes instantly
         this.loadExpenses();
       },
-      error: err => {
-        console.error('Failed to add expense', err);
-      }
+      error: err => console.error('Failed to add expense', err)
     });
   }
 
