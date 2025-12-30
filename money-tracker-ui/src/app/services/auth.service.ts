@@ -27,6 +27,19 @@ export class AuthService {
       );
   }
 
+  register(user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) {
+    return this.http.post(
+      `${this.API_URL}/register`,
+      user,
+      { responseType: 'text' }
+    );
+  }
+
   logout() {
     localStorage.clear();
     this.loggedIn$.next(false);

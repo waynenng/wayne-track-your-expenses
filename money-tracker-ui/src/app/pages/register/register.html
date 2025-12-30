@@ -1,0 +1,47 @@
+<h2>Sign Up</h2>
+
+<p *ngIf="error" style="color:red">{{ error }}</p>
+
+<form (ngSubmit)="register()">
+
+  <input
+    type="text"
+    placeholder="First Name"
+    [(ngModel)]="firstName"
+    name="firstName"
+    required
+  />
+
+  <input
+    type="text"
+    placeholder="Last Name"
+    [(ngModel)]="lastName"
+    name="lastName"
+    required
+  />
+
+  <input
+    type="email"
+    placeholder="Email"
+    [(ngModel)]="email"
+    name="email"
+    required
+  />
+
+  <input
+    type="password"
+    placeholder="Password"
+    [(ngModel)]="password"
+    name="password"
+    required
+  />
+
+  <button type="submit">Create Account</button>
+</form>
+
+<hr />
+
+<p>
+  Already have an account?
+  <a routerLink="/">Login</a>
+</p>
