@@ -176,6 +176,7 @@ export class MonthComponent implements OnInit {
     this.categoryService.addCategory(category).subscribe({
       next: (created: Category) => {
         this.categories.push(created);
+        this.cdr.detectChanges();
         this.categoryId = created.id;
         this.newCategoryName = '';
         this.showNewCategory = false;
