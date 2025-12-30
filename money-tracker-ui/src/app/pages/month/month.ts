@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { ExpenseService, Expense } from '../../services/expense.service';
 import { CategoryService, Category } from '../../services/category.service';
 import { MonthService, Month } from '../../services/month.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-month',
@@ -35,6 +36,7 @@ export class MonthComponent implements OnInit {
     private expenseService: ExpenseService,
     private categoryService: CategoryService,
     private router: Router,
+    private authService: AuthService,
     private monthService: MonthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -79,7 +81,10 @@ export class MonthComponent implements OnInit {
   }
 
   loadCategories() {
-    this.categoryService.getCategories().subscribe({
+    const userId = this.authService.getUserId();
+    if (!userId) return;
+
+    this.categoryService.getCategories(userId).subscribe({
       next: (data) => {
         this.categories = data;
         if (data.length > 0) {

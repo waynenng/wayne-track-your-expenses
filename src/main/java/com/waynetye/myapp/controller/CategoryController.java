@@ -10,34 +10,47 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin(origins = "*") // allow access from frontend
+@CrossOrigin(origins = "*")
 public class CategoryController {
 
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // ✅ 1. Get all categories
+    // ✅ 1. Get categories for a specific user ONLY
     @GetMapping
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<Category> getCategoriesByUser(@RequestParam String userId) {
+        return categoryRepository.findByUserId(userId);
     }
 
-    // ✅ 2. Get category by ID
+    // ✅ 2. Get category by ID (ownership enforced)
     @GetMapping("/{id}")
-    public Optional<Category> getCategoryById(@PathVariable String id) {
-        return categoryRepository.findById(id);
+    public Category getCategoryById(
+            @PathVariable String id,
+            @RequestParam String userId
+    ) {
+        return categoryRepository.findById(id)
+                .filter(c -> c.getUserId().equals(userId))
+                .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
-    // ✅ 3. Create a new category
+    // ✅ 3. Create category (must include userId)
     @PostMapping
     public Category createCategory(@RequestBody Category category) {
+        if (category.getUserId() == null) {
+            throw new RuntimeException("userId is required");
+        }
         return categoryRepository.save(category);
     }
 
-    // ✅ 4. Update category
+    // ✅ 4. Update category (ownership enforced)
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable String id, @RequestBody Category categoryDetails) {
+    public Category updateCategory(
+            @PathVariable String id,
+            @RequestParam String userId,
+            @RequestBody Category categoryDetails
+    ) {
         return categoryRepository.findById(id)
+                .filter(c -> c.getUserId().equals(userId))
                 .map(category -> {
                     category.setName(categoryDetails.getName());
                     category.setDescription(categoryDetails.getDescription());
@@ -46,9 +59,16 @@ public class CategoryController {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
-    // ✅ 5. Delete category
+    // ✅ 5. Delete category (ownership enforced)
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable String id) {
-        categoryRepository.deleteById(id);
+    public void deleteCategory(
+            @PathVariable String id,
+            @RequestParam String userId
+    ) {
+        Category category = categoryRepository.findById(id)
+                .filter(c -> c.getUserId().equals(userId))
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        categoryRepository.delete(category);
     }
 }

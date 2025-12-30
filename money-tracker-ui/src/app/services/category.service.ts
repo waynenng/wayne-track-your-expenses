@@ -17,7 +17,9 @@ export class CategoryService {
 
   constructor(private http: HttpClient) {}
 
-  getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(this.API_URL);
+  getCategories(userId: string) {
+    return this.http.get<Category[]>(
+      `${this.API_URL}?userId=${userId}`
+    );
   }
 }
