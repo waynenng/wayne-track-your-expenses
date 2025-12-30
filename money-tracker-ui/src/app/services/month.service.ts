@@ -14,13 +14,20 @@ export interface Month {
 })
 export class MonthService {
 
-  private baseUrl = 'http://localhost:8080/api/months';
+  private API_URL = 'http://localhost:8080/api/months';
 
   constructor(private http: HttpClient) {}
 
   getMonthsByUser(userId: string): Observable<Month[]> {
     return this.http.get<Month[]>(
-      `${this.baseUrl}/by-user?userId=${userId}`
+      `${this.API_URL}/by-user?userId=${userId}`
     );
   }
+
+  getMonthById(monthId: string) {
+    return this.http.get<Month>(
+      `${this.API_URL}/${monthId}`
+    );
+  }
+
 }

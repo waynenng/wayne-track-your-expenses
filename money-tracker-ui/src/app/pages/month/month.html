@@ -43,8 +43,11 @@
     type="date"
     [(ngModel)]="date"
     name="date"
+    [min]="monthYear + '-' + (monthNumber | number:'2.0') + '-01'"
+    [max]="monthYear + '-' + (monthNumber | number:'2.0') + '-31'"
     required
   />
+
 
   <!-- 📂 Category selector -->
   <select [(ngModel)]="categoryId" name="categoryId" required>

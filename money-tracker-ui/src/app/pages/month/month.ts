@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 
 import { ExpenseService, Expense } from '../../services/expense.service';
 import { CategoryService, Category } from '../../services/category.service';
+import { MonthService, Month } from '../../services/month.service';
 
 @Component({
   selector: 'app-month',
@@ -19,6 +20,8 @@ export class MonthComponent implements OnInit {
   categories: Category[] = [];
 
   monthId!: string;
+  monthYear!: number;
+  monthNumber!: number;
 
   currency: 'RM' | '$' = 'RM';
 
@@ -32,13 +35,25 @@ export class MonthComponent implements OnInit {
     private expenseService: ExpenseService,
     private categoryService: CategoryService,
     private router: Router,
+    private monthService: MonthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.monthId = this.route.snapshot.paramMap.get('id')!;
+    this.loadMonthMeta();
     this.loadExpenses();
     this.loadCategories();
+  }
+
+  loadMonthMeta() {
+    this.monthService.getMonthById(this.monthId).subscribe({
+      next: (month: Month) => {
+        this.monthYear = month.year;
+        this.monthNumber = month.month;
+      },
+      error: (err: any) => console.error('Failed to load month metadata', err)
+    });
   }
 
   loadExpenses() {
@@ -86,6 +101,19 @@ export class MonthComponent implements OnInit {
       return;
     }
 
+    // 🔒 DATE VALIDATION (frontend)
+    const selectedDate = new Date(this.date);
+    const selectedYear = selectedDate.getFullYear();
+    const selectedMonth = selectedDate.getMonth() + 1; // JS = 0-based
+
+    if (
+      selectedYear !== this.monthYear ||
+      selectedMonth !== this.monthNumber
+    ) {
+      alert('You can only add expenses within this month.');
+      return;
+    }
+
     const expense: Expense = {
       monthId: this.monthId,
       categoryId: this.categoryId,
@@ -97,6 +125,7 @@ export class MonthComponent implements OnInit {
     this.expenseService.addExpense(expense).subscribe({
       next: (savedExpense) => {
 
+        // ✅ instant UI update + stable ordering
         this.expenses = [
           savedExpense,
           ...this.expenses
@@ -104,18 +133,17 @@ export class MonthComponent implements OnInit {
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
 
-        this.cdr.markForCheck(); // 🔥 FORCE UI UPDATE
+        // 🔥 required because of SSR + standalone components
+        this.cdr.markForCheck();
 
+        // ♻️ reset form
         this.amount = 0;
         this.description = '';
         this.date = new Date().toISOString().substring(0, 10);
       },
       error: err => console.error(err)
     });
-
   }
-
-
 
   back() {
     this.router.navigate(['/home']);
