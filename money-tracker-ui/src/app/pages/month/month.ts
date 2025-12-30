@@ -157,27 +157,35 @@ export class MonthComponent implements OnInit {
   addCategory() {
     if (!this.newCategoryName?.trim()) return;
 
+    const exists = this.categories.some(
+      c => c.name.toLowerCase() === this.newCategoryName.trim().toLowerCase()
+    );
+
+    if (exists) {
+      this.categoryError = 'Category already exists';
+      return; // 👈 OK now
+    }
+
+    this.categoryError = ''; // clear previous error
+
     const category = {
       name: this.newCategoryName.trim(),
       userId: this.authService.getUserId()!
     };
 
-    this.categoryService.createCategory(category).subscribe({
+    this.categoryService.addCategory(category).subscribe({
       next: (created: Category) => {
         this.categories.push(created);
         this.categoryId = created.id;
         this.newCategoryName = '';
-        this.categoryError = '';
         this.showNewCategory = false;
+        this.categoryError = '';
       },
-      error: err => {
-        if (err.status === 400) {
-          this.categoryError = 'Category already exists';
-        } else {
-          this.categoryError = 'Failed to add category';
-        }
+      error: (err: any) => {
+        this.categoryError = err?.error || 'Failed to add category';
       }
     });
+
   }
 
   back() {

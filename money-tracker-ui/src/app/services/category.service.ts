@@ -29,4 +29,8 @@ export class CategoryService {
       `${this.API_URL}?userId=${userId}`
     );
   }
+
+  addCategory(category: Omit<Category, 'id'>): Observable<Category> {
+    return this.http.post<Category>(this.API_URL, category);
+  }
 }
