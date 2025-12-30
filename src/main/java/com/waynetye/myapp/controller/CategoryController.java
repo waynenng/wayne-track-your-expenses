@@ -3,7 +3,9 @@ package com.waynetye.myapp.controller;
 import com.waynetye.myapp.model.Category;
 import com.waynetye.myapp.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,9 +38,21 @@ public class CategoryController {
     // ✅ 3. Create category (must include userId)
     @PostMapping
     public Category createCategory(@RequestBody Category category) {
-        if (category.getUserId() == null) {
-            throw new RuntimeException("userId is required");
+
+        // ✅ Normalize name (prevents "Food" vs " food ")
+        String normalizedName = category.getName().trim();
+
+        Category existing = categoryRepository
+                .findByNameAndUserId(normalizedName, category.getUserId());
+
+        if (existing != null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Category already exists"
+            );
         }
+
+        category.setName(normalizedName);
         return categoryRepository.save(category);
     }
 

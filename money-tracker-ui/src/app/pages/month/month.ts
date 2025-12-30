@@ -26,6 +26,7 @@ export class MonthComponent implements OnInit {
 
   showNewCategory = false;
   newCategoryName = '';
+  categoryError = '';
 
   currency: 'RM' | '$' = 'RM';
 
@@ -154,7 +155,7 @@ export class MonthComponent implements OnInit {
   }
 
   addCategory() {
-    if (!this.newCategoryName.trim()) return;
+    if (!this.newCategoryName?.trim()) return;
 
     const category = {
       name: this.newCategoryName.trim(),
@@ -163,17 +164,19 @@ export class MonthComponent implements OnInit {
 
     this.categoryService.createCategory(category).subscribe({
       next: (created: Category) => {
-        // ✅ add instantly to list
         this.categories.push(created);
-
-        // ✅ auto-select new category
         this.categoryId = created.id;
-
-        // ✅ reset UI
         this.newCategoryName = '';
+        this.categoryError = '';
         this.showNewCategory = false;
       },
-      error: (err: any) => console.error('Failed to add category', err)
+      error: err => {
+        if (err.status === 400) {
+          this.categoryError = 'Category already exists';
+        } else {
+          this.categoryError = 'Failed to add category';
+        }
+      }
     });
   }
 

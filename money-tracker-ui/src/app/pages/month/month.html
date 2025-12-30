@@ -69,6 +69,10 @@
     <button type="button" (click)="addCategory()">
       Save Category
     </button>
+
+    <p *ngIf="categoryError" style="color:red;">
+      {{ categoryError }}
+    </p>
   </div>
 
   <button type="submit">Add Expense</button>
