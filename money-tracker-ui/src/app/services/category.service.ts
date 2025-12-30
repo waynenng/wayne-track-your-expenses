@@ -17,6 +17,13 @@ export class CategoryService {
 
   constructor(private http: HttpClient) {}
 
+  createCategory(category: Partial<Category>) {
+    return this.http.post<Category>(
+      this.API_URL,
+      category
+    );
+  }
+
   getCategories(userId: string) {
     return this.http.get<Category[]>(
       `${this.API_URL}?userId=${userId}`

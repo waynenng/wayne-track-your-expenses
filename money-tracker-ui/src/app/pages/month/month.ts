@@ -24,6 +24,9 @@ export class MonthComponent implements OnInit {
   monthYear!: number;
   monthNumber!: number;
 
+  showNewCategory = false;
+  newCategoryName = '';
+
   currency: 'RM' | '$' = 'RM';
 
   amount!: number;
@@ -100,7 +103,7 @@ export class MonthComponent implements OnInit {
       !this.amount ||
       this.amount <= 0 ||
       !this.description.trim() ||
-      !this.categoryId ||
+      this.categoryId === '__new__' ||
       !this.date
     ) {
       return;
@@ -147,6 +150,30 @@ export class MonthComponent implements OnInit {
         this.date = new Date().toISOString().substring(0, 10);
       },
       error: err => console.error(err)
+    });
+  }
+
+  addCategory() {
+    if (!this.newCategoryName.trim()) return;
+
+    const category = {
+      name: this.newCategoryName.trim(),
+      userId: this.authService.getUserId()!
+    };
+
+    this.categoryService.createCategory(category).subscribe({
+      next: (created: Category) => {
+        // ✅ add instantly to list
+        this.categories.push(created);
+
+        // ✅ auto-select new category
+        this.categoryId = created.id;
+
+        // ✅ reset UI
+        this.newCategoryName = '';
+        this.showNewCategory = false;
+      },
+      error: (err: any) => console.error('Failed to add category', err)
     });
   }
 

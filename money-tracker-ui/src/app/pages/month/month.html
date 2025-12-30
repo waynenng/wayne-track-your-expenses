@@ -54,7 +54,22 @@
     <option *ngFor="let c of categories" [value]="c.id">
       {{ c.name }}
     </option>
+
+    <option value="__new__">➕ Add new category</option>
   </select>
+
+  <div *ngIf="categoryId === '__new__'">
+    <input
+      type="text"
+      placeholder="New category name"
+      [(ngModel)]="newCategoryName"
+      name="newCategoryName"
+    />
+
+    <button type="button" (click)="addCategory()">
+      Save Category
+    </button>
+  </div>
 
   <button type="submit">Add Expense</button>
 </form>
