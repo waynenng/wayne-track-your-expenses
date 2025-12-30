@@ -11,6 +11,12 @@
 
 <hr />
 
+<h3>
+  Total:
+  {{ currency }}
+  {{ getMonthlyTotal() | number:'1.2-2' }}
+</h3>
+
 <!-- ➕ Add Expense Form -->
 <form (ngSubmit)="addExpense()" style="margin-bottom: 1rem">
 

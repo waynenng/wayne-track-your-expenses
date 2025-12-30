@@ -54,7 +54,9 @@ export class MonthComponent implements OnInit {
     });
   }
 
-
+  getMonthlyTotal(): number {
+    return this.expenses.reduce((sum, e) => sum + e.amount, 0);
+  }
 
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(c => c.id === categoryId);
