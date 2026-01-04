@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface MonthRepository extends MongoRepository<Month, String> {
 
     // ✅ Get all months for a user, ordered chronologically
-    List<Month> findByUserIdOrderByYearAscMonthAsc(String userId);
+    List<Month> findByUserIdOrderByYearDescMonthDesc(String userId);
 
     // ✅ Find a specific month deterministically
     Optional<Month> findByUserIdAndYearAndMonth(

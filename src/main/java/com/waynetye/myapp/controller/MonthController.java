@@ -23,7 +23,7 @@ public class MonthController {
     @GetMapping("/by-user")
     public List<Month> getMonthsByUser(@RequestParam String userId) {
         ensureCurrentMonthExists(userId);
-        return monthRepository.findByUserIdOrderByYearAscMonthAsc(userId);
+        return monthRepository.findByUserIdOrderByYearDescMonthDesc(userId);
     }
 
     /**
