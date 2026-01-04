@@ -12,6 +12,7 @@ public class User {
     private String lastName;   // User's last name
     private String email;      // Used for login & notifications
     private String password;   // Hashed password for authentication
+    private String currency;
 
     // Default constructor
     public User() {}
@@ -39,4 +40,8 @@ public class User {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
+
 }

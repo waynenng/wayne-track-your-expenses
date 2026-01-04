@@ -22,6 +22,7 @@ export class AuthService {
         tap(res => {
           localStorage.setItem('loggedIn', 'true');
           localStorage.setItem('userId', res.userId);
+          localStorage.setItem('currency', res.currency);
           this.loggedIn$.next(true);
         })
       );
@@ -52,5 +53,13 @@ export class AuthService {
 
   getUserId(): string | null {
     return localStorage.getItem('userId');
+  }
+
+  getCurrency(): 'RM' | '$' {
+    return (localStorage.getItem('currency') as 'RM' | '$') || 'RM';
+  }
+
+  setCurrency(currency: 'RM' | '$') {
+    localStorage.setItem('currency', currency);
   }
 }

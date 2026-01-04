@@ -31,4 +31,11 @@ export class MonthService {
     );
   }
 
+  updateMonthCurrency(monthId: string, currency: 'RM' | '$') {
+    return this.http.put(
+      `${this.API_URL}/${monthId}`,
+      { currency }
+    );
+  }
+
 }

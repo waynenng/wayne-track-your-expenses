@@ -27,7 +27,8 @@
 
     <!-- 💰 Monthly total -->
     <div style="font-weight: bold">
-      RM {{ m.total | number:'1.2-2' }}
+      {{ currency }}
+      {{ m.total | number:'1.2-2' }}
     </div>
   </div>
   }

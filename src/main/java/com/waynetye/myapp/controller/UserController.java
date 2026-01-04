@@ -102,9 +102,20 @@ public class UserController {
             User user = existingUser.get();
 
             if (passwordEncoder.matches(loginData.getPassword(), user.getPassword())) {
+
+                // ✅ Defensive default
+                String currency = user.getCurrency() != null ? user.getCurrency() : "RM";
+
+                // Optional: persist fix back to DB
+                if (user.getCurrency() == null) {
+                    user.setCurrency("RM");
+                    userRepository.save(user);
+                }
+
                 return ResponseEntity.ok(
                         Map.of(
                                 "userId", user.getId(),
+                                "currency", currency,
                                 "message", "Login successful"
                         )
                 );
@@ -113,5 +124,25 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("Invalid email or password");
+    }
+
+    @PutMapping("/{id}/currency")
+    public ResponseEntity<?> updateCurrency(
+            @PathVariable String id,
+            @RequestBody Map<String, String> body
+    ) {
+        String currency = body.get("currency");
+
+        if (!"RM".equals(currency) && !"$".equals(currency)) {
+            return ResponseEntity.badRequest().body("Invalid currency");
+        }
+
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setCurrency(currency);
+                    userRepository.save(user);
+                    return ResponseEntity.ok().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }

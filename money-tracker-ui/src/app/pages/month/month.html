@@ -3,7 +3,7 @@
 <!-- 🔁 Currency selector -->
 <label>
   Currency:
-  <select [(ngModel)]="currency">
+  <select [ngModel]="currency" (ngModelChange)="onCurrencyChange($event)">
     <option value="RM">RM</option>
     <option value="$">$</option>
   </select>

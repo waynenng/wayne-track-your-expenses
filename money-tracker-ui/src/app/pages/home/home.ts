@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { MonthService, Month } from '../../services/month.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -15,10 +16,12 @@ export class HomeComponent implements OnInit {
 
   months: Month[] = [];
   userId!: string;
+  currency: 'RM' | '$' = 'RM';
 
   constructor(
     private authService: AuthService,
     private monthService: MonthService,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -32,6 +35,7 @@ export class HomeComponent implements OnInit {
     }
 
     this.userId = userId;
+    this.currency = this.authService.getCurrency();
     this.loadMonths();
   }
 
@@ -43,6 +47,16 @@ export class HomeComponent implements OnInit {
       },
       error: (err) => console.error(err)
     });
+  }
+
+  onCurrencyChange(currency: 'RM' | '$') {
+    this.currency = currency;
+    this.authService.setCurrency(currency);
+
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.userService.updateCurrency(userId, currency).subscribe();
+    }
   }
 
   getMonthName(month: number): string {

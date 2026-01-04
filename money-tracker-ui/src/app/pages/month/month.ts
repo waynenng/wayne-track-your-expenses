@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-
+import { UserService } from '../../services/user.service';
 import { ExpenseService, Expense } from '../../services/expense.service';
 import { CategoryService, Category } from '../../services/category.service';
 import { MonthService, Month } from '../../services/month.service';
@@ -27,7 +27,6 @@ export class MonthComponent implements OnInit {
   showNewCategory = false;
   newCategoryName = '';
   categoryError = '';
-
   currency: 'RM' | '$' = 'RM';
 
   amount!: number;
@@ -41,6 +40,7 @@ export class MonthComponent implements OnInit {
     private categoryService: CategoryService,
     private router: Router,
     private authService: AuthService,
+    private userService: UserService,
     private monthService: MonthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -48,6 +48,7 @@ export class MonthComponent implements OnInit {
   ngOnInit(): void {
     this.monthId = this.route.snapshot.paramMap.get('id')!;
     this.loadMonthMeta();
+    this.currency = this.authService.getCurrency();
     this.loadExpenses();
     this.loadCategories();
   }
@@ -60,6 +61,16 @@ export class MonthComponent implements OnInit {
       },
       error: (err: any) => console.error('Failed to load month metadata', err)
     });
+  }
+
+  onCurrencyChange(currency: 'RM' | '$') {
+    this.currency = currency;
+    this.authService.setCurrency(currency);
+
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.userService.updateCurrency(userId, currency).subscribe();
+    }
   }
 
   loadExpenses() {
