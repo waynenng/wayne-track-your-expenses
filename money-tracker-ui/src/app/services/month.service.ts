@@ -5,8 +5,9 @@ import { Observable } from 'rxjs';
 export interface Month {
   id: string;
   year: number;
-  month: number; // 🔴 THIS MUST EXIST
+  month: number;
   userId: string;
+  total: number;
 }
 
 @Injectable({

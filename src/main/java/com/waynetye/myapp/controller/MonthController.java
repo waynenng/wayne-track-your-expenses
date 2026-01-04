@@ -1,6 +1,8 @@
 package com.waynetye.myapp.controller;
 
+import com.waynetye.myapp.model.Expense;
 import com.waynetye.myapp.model.Month;
+import com.waynetye.myapp.repository.ExpenseRepository;
 import com.waynetye.myapp.repository.MonthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,8 @@ public class MonthController {
 
     @Autowired
     private MonthRepository monthRepository;
+    @Autowired
+    private ExpenseRepository expenseRepository;
 
     /**
      * ✅ Get all months for a user (chronologically ordered)
@@ -22,8 +26,24 @@ public class MonthController {
      */
     @GetMapping("/by-user")
     public List<Month> getMonthsByUser(@RequestParam String userId) {
+
         ensureCurrentMonthExists(userId);
-        return monthRepository.findByUserIdOrderByYearDescMonthDesc(userId);
+
+        List<Month> months =
+                monthRepository.findByUserIdOrderByYearDescMonthDesc(userId);
+
+        // ✅ compute totals
+        for (Month month : months) {
+            double total = expenseRepository
+                    .findByMonthId(month.getId())
+                    .stream()
+                    .mapToDouble(Expense::getAmount)
+                    .sum();
+
+            month.setTotal(total);
+        }
+
+        return months;
     }
 
     /**

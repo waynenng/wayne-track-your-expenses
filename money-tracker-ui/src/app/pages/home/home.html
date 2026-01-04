@@ -8,9 +8,27 @@
   <div
     class="month-card"
     (click)="openMonth(m)"
-    style="cursor:pointer; border:1px solid #ccc; padding:12px; margin-bottom:10px;"
+    style="
+          cursor: pointer;
+          border: 1px solid #ccc;
+          padding: 12px;
+          margin-bottom: 10px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
   >
-    <h3>{{ getMonthName(m.month) }} {{ m.year }}</h3>
+    <!-- 📅 Month label -->
+    <div>
+      <h3 style="margin: 0">
+        {{ getMonthName(m.month) }} {{ m.year }}
+      </h3>
+    </div>
+
+    <!-- 💰 Monthly total -->
+    <div style="font-weight: bold">
+      RM {{ m.total | number:'1.2-2' }}
+    </div>
   </div>
   }
 </div>

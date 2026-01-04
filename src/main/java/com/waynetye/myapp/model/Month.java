@@ -13,6 +13,7 @@ public class Month {
     private int year;        // e.g. 2025
     private int month;       // 1–12
     private String userId;   // owner
+    private double total;
 
     private List<String> expenseIds;
 
@@ -38,5 +39,8 @@ public class Month {
 
     public List<String> getExpenseIds() { return expenseIds; }
     public void setExpenseIds(List<String> expenseIds) { this.expenseIds = expenseIds; }
+
+    public double getTotal() { return total; }
+    public void setTotal(double total) { this.total = total; }
 }
 
