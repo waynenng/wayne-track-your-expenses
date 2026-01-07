@@ -37,6 +37,15 @@ export class MonthComponent implements OnInit {
   selectedCategoryId: string = 'ALL';
   filteredExpenses: Expense[] = [];
 
+  editingExpenseId: string | null = null;
+
+  editForm = {
+    amount: 0,
+    description: '',
+    date: '',
+    categoryId: ''
+  };
+
   constructor(
     private route: ActivatedRoute,
     private expenseService: ExpenseService,
@@ -221,6 +230,52 @@ export class MonthComponent implements OnInit {
       }
     });
 
+  }
+
+  startEdit(expense: Expense) {
+    if (!expense.id) return;   // safety guard
+    this.editingExpenseId = expense.id;
+
+    this.editForm = {
+      amount: expense.amount,
+      description: expense.description,
+      date: expense.date,
+      categoryId: expense.categoryId
+    };
+  }
+
+  cancelEdit() {
+    this.editingExpenseId = null;
+  }
+
+  saveEdit(expense: Expense) {
+    if (!expense.id) return; // ⛔ hard guard
+
+    const updated: Expense = {
+      ...expense,
+      amount: this.editForm.amount,
+      description: this.editForm.description,
+      date: this.editForm.date,
+      categoryId: this.editForm.categoryId
+    };
+
+    this.expenseService.updateExpense(expense.id, updated).subscribe({
+      next: (saved: Expense) => {
+        this.expenses = this.expenses.map(e =>
+          e.id === saved.id ? saved : e
+        );
+
+        this.expenses.sort((a, b) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        this.applyCategoryFilter();
+        this.editingExpenseId = null;
+        this.cdr.markForCheck();
+      },
+      error: (err: any) =>
+        console.error('Failed to update expense', err)
+    });
   }
 
   back() {

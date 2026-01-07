@@ -101,10 +101,65 @@
 
   <tbody>
   <tr *ngFor="let e of filteredExpenses">
-    <td>{{ e.date | date:'dd MMM yyyy' }}</td>
-    <td>{{ e.description }}</td>
-    <td>{{ getCategoryName(e.categoryId) }}</td>
-    <td>{{ currency }} {{ e.amount | number:'1.2-2' }}</td>
+    <!-- DATE -->
+    <td>
+      <ng-container *ngIf="editingExpenseId !== e.id; else editDate">
+        {{ e.date | date:'dd MMM yyyy' }}
+      </ng-container>
+
+      <ng-template #editDate>
+        <input type="date" [(ngModel)]="editForm.date" />
+      </ng-template>
+    </td>
+
+    <!-- DESCRIPTION -->
+    <td>
+      <ng-container *ngIf="editingExpenseId !== e.id; else editDesc">
+        {{ e.description }}
+      </ng-container>
+
+      <ng-template #editDesc>
+        <input type="text" [(ngModel)]="editForm.description" />
+      </ng-template>
+    </td>
+
+    <!-- CATEGORY -->
+    <td>
+      <ng-container *ngIf="editingExpenseId !== e.id; else editCategory">
+        {{ getCategoryName(e.categoryId) }}
+      </ng-container>
+
+      <ng-template #editCategory>
+        <select [(ngModel)]="editForm.categoryId">
+          <option *ngFor="let c of categories" [value]="c.id">
+            {{ c.name }}
+          </option>
+        </select>
+      </ng-template>
+    </td>
+
+    <!-- AMOUNT -->
+    <td>
+      <ng-container *ngIf="editingExpenseId !== e.id; else editAmount">
+        {{ currency }} {{ e.amount | number:'1.2-2' }}
+      </ng-container>
+
+      <ng-template #editAmount>
+        <input type="number" step="0.01" [(ngModel)]="editForm.amount" />
+      </ng-template>
+    </td>
+
+    <!-- ACTIONS -->
+    <td>
+      <ng-container *ngIf="editingExpenseId !== e.id">
+        <button (click)="startEdit(e)">Edit</button>
+      </ng-container>
+
+      <ng-container *ngIf="editingExpenseId === e.id">
+        <button (click)="saveEdit(e)">Save</button>
+        <button (click)="cancelEdit()">Cancel</button>
+      </ng-container>
+    </td>
   </tr>
   </tbody>
 </table>
