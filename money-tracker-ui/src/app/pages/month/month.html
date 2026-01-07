@@ -78,8 +78,18 @@
   <button type="submit">Add Expense</button>
 </form>
 
+<label>
+  Filter by category:
+  <select [(ngModel)]="selectedCategoryId" (change)="applyCategoryFilter()">
+    <option value="ALL">All categories</option>
+    <option *ngFor="let c of categories" [value]="c.id">
+      {{ c.name }}
+    </option>
+  </select>
+</label>
+
 <!-- 📊 Expenses Table (FIXED: reactive + async pipe) -->
-<table *ngIf="expenses.length > 0; else empty" border="1" cellpadding="8">
+<table *ngIf="filteredExpenses.length > 0; else empty" border="1" cellpadding="8">
   <thead>
   <tr>
     <th>Date</th>
@@ -90,7 +100,7 @@
   </thead>
 
   <tbody>
-  <tr *ngFor="let e of expenses">
+  <tr *ngFor="let e of filteredExpenses">
     <td>{{ e.date | date:'dd MMM yyyy' }}</td>
     <td>{{ e.description }}</td>
     <td>{{ getCategoryName(e.categoryId) }}</td>

@@ -34,6 +34,9 @@ export class MonthComponent implements OnInit {
   date = new Date().toISOString().substring(0, 10);
   categoryId!: string;
 
+  selectedCategoryId: string = 'ALL';
+  filteredExpenses: Expense[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private expenseService: ExpenseService,
@@ -76,18 +79,34 @@ export class MonthComponent implements OnInit {
   loadExpenses() {
     this.expenseService.getExpensesByMonth(this.monthId).subscribe({
       next: (data) => {
+        // 1️⃣ Store ALL expenses (sorted)
         this.expenses = [...data].sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          (a, b) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
         );
 
-        this.cdr.markForCheck(); // 🔥 FORCE UI UPDATE
+        // 2️⃣ Apply category filter AFTER loading
+        this.applyCategoryFilter();
+
+        // 3️⃣ Force UI update (important)
+        this.cdr.markForCheck();
       },
       error: (err) => console.error(err)
     });
   }
 
+  applyCategoryFilter() {
+    if (this.selectedCategoryId === 'ALL') {
+      this.filteredExpenses = [...this.expenses];
+    } else {
+      this.filteredExpenses = this.expenses.filter(
+        e => e.categoryId === this.selectedCategoryId
+      );
+    }
+  }
+
   getMonthlyTotal(): number {
-    return this.expenses.reduce((sum, e) => sum + e.amount, 0);
+    return this.filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
   }
 
   getCategoryName(categoryId: string): string {
@@ -145,7 +164,7 @@ export class MonthComponent implements OnInit {
     this.expenseService.addExpense(expense).subscribe({
       next: (savedExpense) => {
 
-        // ✅ instant UI update + stable ordering
+        // ✅ 1. Update source-of-truth list (NEWEST FIRST)
         this.expenses = [
           savedExpense,
           ...this.expenses
@@ -153,10 +172,13 @@ export class MonthComponent implements OnInit {
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
 
-        // 🔥 required because of SSR + standalone components
+        // ✅ 2. Re-apply category filter (CRITICAL)
+        this.applyCategoryFilter();
+
+        // 🔥 3. Force immediate UI update (standalone + SSR-safe)
         this.cdr.markForCheck();
 
-        // ♻️ reset form
+        // ♻️ 4. Reset form (safe defaults)
         this.amount = 0;
         this.description = '';
         this.date = new Date().toISOString().substring(0, 10);
@@ -164,6 +186,7 @@ export class MonthComponent implements OnInit {
       error: err => console.error(err)
     });
   }
+
 
   addCategory() {
     if (!this.newCategoryName?.trim()) return;
