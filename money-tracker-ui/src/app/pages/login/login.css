@@ -1,17 +1,46 @@
+h1, h2, h3 {
+  text-align: center;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.1em;
+}
+
+h1 {
+  font-size: 5rem;
+  font-weight: 700;
+  color: #1f2933; /* dark slate */
+  margin-bottom: -0.2rem;
+}
+
+h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280; /* muted gray */
+}
+
+h3 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #4f46e5;
+  letter-spacing: 0.12em;
+  margin-top: 0.2rem;
+  margin-bottom: -2.5rem;
+}
+
 /* Center the login card */
 .login-container {
   max-width: 400px;
   margin: 100px auto;
   padding: 32px;
   border-radius: 8px;
-  background: #ffffff;
+  background: #fafafa;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   text-align: center;
 }
 
 /* Title */
 .login-container h2 {
-  margin-bottom: 24px;
+  margin-top: 5px;
+  margin-bottom: 35px;
   font-size: 1.6rem;
   font-weight: 600;
 }
