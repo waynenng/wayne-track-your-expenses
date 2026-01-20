@@ -189,3 +189,47 @@ ng-template p {
   color: #6b7280;
   margin-top: 1rem;
 }
+
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 🔹 Main row layout */
+.expense-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1.2fr 1.2fr;
+  gap: 12px;
+}
+
+/* ➕ New category appears neatly under category */
+.new-category-row {
+  display: flex;
+  gap: 10px;
+  max-width: 50%;
+}
+
+/* Buttons */
+.primary {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.primary:hover {
+  background: #4f46e5;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Error */
+.error {
+  color: #dc2626;
+  font-size: 0.9rem;
+}
