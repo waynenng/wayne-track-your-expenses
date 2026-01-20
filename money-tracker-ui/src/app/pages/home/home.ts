@@ -11,6 +11,7 @@ import { UserService } from '../../services/user.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './home.html',
+  styleUrls: ['./home.css']
 })
 export class HomeComponent implements OnInit {
 
