@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './month.html',
+  styleUrls: ['./month.css']
 })
 export class MonthComponent implements OnInit {
 
