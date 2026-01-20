@@ -151,14 +151,22 @@
 
     <!-- ACTIONS -->
     <td>
-      <ng-container *ngIf="editingExpenseId !== e.id">
-        <button (click)="startEdit(e)">Edit</button>
-      </ng-container>
+      <!-- NORMAL MODE -->
+      @if (editingExpenseId !== e.id) {
+      <button (click)="startEdit(e)">Edit</button>
+      }
 
-      <ng-container *ngIf="editingExpenseId === e.id">
-        <button (click)="saveEdit(e)">Save</button>
-        <button (click)="cancelEdit()">Cancel</button>
-      </ng-container>
+      <!-- EDIT MODE -->
+      @if (editingExpenseId === e.id) {
+      <button (click)="saveEdit(e)">Save</button>
+      <button (click)="cancelEdit()">Cancel</button>
+      <button
+        style="color:red"
+        (click)="deleteExpense(e.id!)"
+      >
+        Delete
+      </button>
+      }
     </td>
   </tr>
   </tbody>

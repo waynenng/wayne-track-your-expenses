@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -54,6 +54,8 @@ export class MonthComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private monthService: MonthService,
+    private zone: NgZone,
+    private appRef: ApplicationRef,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -98,7 +100,7 @@ export class MonthComponent implements OnInit {
         this.applyCategoryFilter();
 
         // 3️⃣ Force UI update (important)
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: (err) => console.error(err)
     });
@@ -149,7 +151,7 @@ export class MonthComponent implements OnInit {
       return;
     }
 
-    // 🔒 DATE VALIDATION (frontend)
+    // DATE VALIDATION (frontend)
     const selectedDate = new Date(this.date);
     const selectedYear = selectedDate.getFullYear();
     const selectedMonth = selectedDate.getMonth() + 1; // JS = 0-based
@@ -173,7 +175,7 @@ export class MonthComponent implements OnInit {
     this.expenseService.addExpense(expense).subscribe({
       next: (savedExpense) => {
 
-        // ✅ 1. Update source-of-truth list (NEWEST FIRST)
+        // Update source-of-truth list (NEWEST FIRST)
         this.expenses = [
           savedExpense,
           ...this.expenses
@@ -181,13 +183,13 @@ export class MonthComponent implements OnInit {
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
 
-        // ✅ 2. Re-apply category filter (CRITICAL)
+        // Re-apply category filter
         this.applyCategoryFilter();
 
-        // 🔥 3. Force immediate UI update (standalone + SSR-safe)
-        this.cdr.markForCheck();
+        // Force immediate UI update
+        this.cdr.detectChanges();
 
-        // ♻️ 4. Reset form (safe defaults)
+        // Reset form (safe defaults)
         this.amount = 0;
         this.description = '';
         this.date = new Date().toISOString().substring(0, 10);
@@ -249,7 +251,7 @@ export class MonthComponent implements OnInit {
   }
 
   saveEdit(expense: Expense) {
-    if (!expense.id) return; // ⛔ hard guard
+    if (!expense.id) return;
 
     const updated: Expense = {
       ...expense,
@@ -261,20 +263,42 @@ export class MonthComponent implements OnInit {
 
     this.expenseService.updateExpense(expense.id, updated).subscribe({
       next: (saved: Expense) => {
+
+        // update master list
         this.expenses = this.expenses.map(e =>
           e.id === saved.id ? saved : e
         );
 
+        // re-sort master list
         this.expenses.sort((a, b) =>
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
 
+        // regenerate what the UI uses
         this.applyCategoryFilter();
+
+        // exit edit mode
         this.editingExpenseId = null;
-        this.cdr.markForCheck();
       },
-      error: (err: any) =>
-        console.error('Failed to update expense', err)
+      error: err => console.error('Failed to update expense', err)
+    });
+  }
+
+  deleteExpense(expenseId: string) {
+    if (!confirm('Delete this expense?')) return;
+
+    this.expenseService.deleteExpense(expenseId).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.expenses = this.expenses.filter(e => e.id !== expenseId);
+          this.editingExpenseId = null;
+
+          // force repaint
+          this.applyCategoryFilter();
+          this.cdr.detectChanges();
+        });
+      },
+      error: err => console.error('Failed to delete expense', err)
     });
   }
 
