@@ -1,12 +1,14 @@
 <h2>Your Expenses</h2>
 
-<button (click)="back()">Back</button>
+<div class="header-actions">
+  <button (click)="back()">Back Home</button>
 
-<h3>
-  Total:
-  {{ currency }}
-  {{ getMonthlyTotal() | number:'1.2-2' }}
-</h3>
+  <h3 class="total">
+    Total:
+    {{ currency }}
+    {{ getMonthlyTotal() | number:'1.2-2' }}
+  </h3>
+</div>
 
 <!-- 🔝 Top bar -->
 <div class="top-bar">
