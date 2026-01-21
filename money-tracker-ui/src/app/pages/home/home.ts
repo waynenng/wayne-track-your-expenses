@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
     this.monthService.getMonthsByUser(this.userId).subscribe({
       next: (data: Month[]) => {
         this.months = data;
-        this.cdr.detectChanges(); // 🔥 THIS fixes disappearing UI
+        this.cdr.detectChanges();
       },
       error: (err) => console.error(err)
     });

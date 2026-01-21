@@ -20,7 +20,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   /**
-   * 🔁 Update user's preferred currency
+   * Update user's preferred currency
    */
   updateCurrency(userId: string, currency: 'RM' | '$'): Observable<User> {
     return this.http.put<User>(
@@ -30,7 +30,7 @@ export class UserService {
   }
 
   /**
-   * 📥 Fetch user (useful after login / refresh)
+   * Fetch user (useful after login / refresh)
    */
   getUserById(userId: string): Observable<User> {
     return this.http.get<User>(
