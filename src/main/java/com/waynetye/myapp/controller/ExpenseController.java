@@ -22,27 +22,26 @@ public class ExpenseController {
     @Autowired
     private ExpenseRepository expenseRepository;
 
-    // ✅ ADD THIS
     @Autowired
     private MonthRepository monthRepository;
 
-    // ✅ 1. Get all expenses
+    // Get all expenses
     @GetMapping
     public List<Expense> getAllExpenses() {
         return expenseRepository.findAll();
     }
 
-    // ✅ 2. Get expense by ID
+    // Get expense by ID
     @GetMapping("/{id}")
     public Optional<Expense> getExpenseById(@PathVariable String id) {
         return expenseRepository.findById(id);
     }
 
-    // ✅ 3. Create a new expense (WITH DATE VALIDATION)
+    // Create a new expense (WITH DATE VALIDATION)
     @PostMapping
     public Expense createExpense(@RequestBody Expense expense) {
 
-        // ✅ Default date if not provided
+        // Default date if not provided
         if (expense.getDate() == null) {
             expense.setDate(LocalDate.now());
         }
@@ -56,7 +55,7 @@ public class ExpenseController {
 
         LocalDate expenseDate = expense.getDate();
 
-        // ❌ Block expenses outside the month
+        // Block expenses outside the month
         if (
                 expenseDate.getYear() != month.getYear() ||
                         expenseDate.getMonthValue() != month.getMonth()
@@ -70,7 +69,7 @@ public class ExpenseController {
         return expenseRepository.save(expense);
     }
 
-    // ✅ 4. Update an expense
+    // Update an expense
     @PutMapping("/{id}")
     public Expense updateExpense(@PathVariable String id, @RequestBody Expense expenseDetails) {
         return expenseRepository.findById(id)
@@ -85,19 +84,19 @@ public class ExpenseController {
                 .orElseThrow(() -> new RuntimeException("Expense not found"));
     }
 
-    // ✅ 5. Delete an expense
+    // Delete an expense
     @DeleteMapping("/{id}")
     public void deleteExpense(@PathVariable String id) {
         expenseRepository.deleteById(id);
     }
 
-    // ✅ 6. Get expenses for a specific month
+    // Get expenses for a specific month
     @GetMapping("/month/{monthId}")
     public List<Expense> getExpensesByMonth(@PathVariable String monthId) {
         return expenseRepository.findByMonthId(monthId);
     }
 
-    // ✅ 7. Get expenses for a specific month and category
+    // Get expenses for a specific month and category
     @GetMapping("/month/{monthId}/category/{categoryId}")
     public List<Expense> getExpensesByMonthAndCategory(
             @PathVariable String monthId,
@@ -106,7 +105,7 @@ public class ExpenseController {
         return expenseRepository.findByMonthIdAndCategoryId(monthId, categoryId);
     }
 
-    // ✅ 8. Get all expenses for a category
+    // Get all expenses for a category
     @GetMapping("/category/{categoryId}")
     public List<Expense> getExpensesByCategory(@PathVariable String categoryId) {
         return expenseRepository.findByCategoryId(categoryId);

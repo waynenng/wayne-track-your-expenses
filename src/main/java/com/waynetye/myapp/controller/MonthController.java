@@ -21,7 +21,7 @@ public class MonthController {
     private ExpenseRepository expenseRepository;
 
     /**
-     * ✅ Get all months for a user (chronologically ordered)
+     * Get all months for a user (chronologically ordered)
      * This is what the Home UI will call.
      */
     @GetMapping("/by-user")
@@ -32,7 +32,7 @@ public class MonthController {
         List<Month> months =
                 monthRepository.findByUserIdOrderByYearDescMonthDesc(userId);
 
-        // ✅ compute totals
+        // compute totals
         for (Month month : months) {
             double total = expenseRepository
                     .findByMonthId(month.getId())
@@ -47,7 +47,7 @@ public class MonthController {
     }
 
     /**
-     * ✅ (Optional) Get a month by ID
+     * Get a month by ID
      * Useful for expense views
      */
     @GetMapping("/{id}")
@@ -57,7 +57,7 @@ public class MonthController {
     }
 
     /**
-     * 🔒 INTERNAL SYSTEM LOGIC
+     * INTERNAL SYSTEM LOGIC
      * Ensures the current calendar month exists for the user.
      */
     private void ensureCurrentMonthExists(String userId) {

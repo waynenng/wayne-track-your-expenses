@@ -28,24 +28,24 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
-    private MonthRepository monthRepository; // ✅ inject Month repository
+    private MonthRepository monthRepository; // inject Month repository
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // ✅ inject BCrypt encoder
+    private PasswordEncoder passwordEncoder; // inject BCrypt encoder
 
-    // ✅ 1. Get all users
+    // Get all users
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // ✅ 2. Get user by ID
+    // Get user by ID
     @GetMapping("/{id}")
     public Optional<User> getUserById(@PathVariable String id) {
         return userRepository.findById(id);
     }
 
-    // ✅ 3. Create a new user (generic)
+    // Create a new user (generic)
     @PostMapping
     public User createUser(@RequestBody User user) {
         // Encrypt password before saving
@@ -53,7 +53,7 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    // ✅ 4. Update user
+    // Update user
     @PutMapping("/{id}")
     public User updateUser(@PathVariable String id, @RequestBody User userDetails) {
         return userRepository.findById(id)
@@ -68,13 +68,13 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // ✅ 5. Delete user
+    // Delete user
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable String id) {
         userRepository.deleteById(id);
     }
 
-    // ✅ 6. Register user (email must be unique + create current month)
+    // Register user (email must be unique + create current month)
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
@@ -87,13 +87,13 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
-        // ❌ Do NOT create month here
+        // Do NOT create month here
         // MonthController will ensure current month exists
 
         return ResponseEntity.ok("User registered successfully");
     }
 
-    // ✅ 7. Login user (BCrypt password comparison)
+    // Login user (BCrypt password comparison)
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User loginData) {
         Optional<User> existingUser = userRepository.findByEmail(loginData.getEmail());
@@ -103,7 +103,7 @@ public class UserController {
 
             if (passwordEncoder.matches(loginData.getPassword(), user.getPassword())) {
 
-                // ✅ Defensive default
+                // Defensive default
                 String currency = user.getCurrency() != null ? user.getCurrency() : "RM";
 
                 // Optional: persist fix back to DB

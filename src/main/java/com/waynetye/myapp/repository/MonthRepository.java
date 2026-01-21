@@ -10,10 +10,10 @@ import java.util.Optional;
 @Repository
 public interface MonthRepository extends MongoRepository<Month, String> {
 
-    // ✅ Get all months for a user, ordered chronologically
+    // Get all months for a user, ordered chronologically
     List<Month> findByUserIdOrderByYearDescMonthDesc(String userId);
 
-    // ✅ Find a specific month deterministically
+    // Find a specific month deterministically
     Optional<Month> findByUserIdAndYearAndMonth(
             String userId,
             int year,

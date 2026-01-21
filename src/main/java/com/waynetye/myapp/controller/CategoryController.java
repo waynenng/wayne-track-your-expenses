@@ -18,13 +18,13 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // ✅ 1. Get categories for a specific user ONLY
+    // Get categories for a specific user ONLY
     @GetMapping
     public List<Category> getCategoriesByUser(@RequestParam String userId) {
         return categoryRepository.findByUserId(userId);
     }
 
-    // ✅ 2. Get category by ID (ownership enforced)
+    // Get category by ID (ownership enforced)
     @GetMapping("/{id}")
     public Category getCategoryById(
             @PathVariable String id,
@@ -35,11 +35,11 @@ public class CategoryController {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
-    // ✅ 3. Create category (must include userId)
+    // Create category (must include userId)
     @PostMapping
     public Category createCategory(@RequestBody Category category) {
 
-        // ✅ Normalize name (prevents "Food" vs " food ")
+        // Normalize name (prevents "Food" vs " food ")
         String normalizedName = category.getName().trim();
 
         Category existing = categoryRepository
@@ -56,7 +56,7 @@ public class CategoryController {
         return categoryRepository.save(category);
     }
 
-    // ✅ 4. Update category (ownership enforced)
+    // Update category (ownership enforced)
     @PutMapping("/{id}")
     public Category updateCategory(
             @PathVariable String id,
@@ -73,7 +73,7 @@ public class CategoryController {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
-    // ✅ 5. Delete category (ownership enforced)
+    // Delete category (ownership enforced)
     @DeleteMapping("/{id}")
     public void deleteCategory(
             @PathVariable String id,
