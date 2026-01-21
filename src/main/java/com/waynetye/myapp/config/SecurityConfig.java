@@ -10,13 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig {
 
-    // ✅ BCrypt encoder bean
+    // BCrypt encoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Disable authentication for all endpoints
+    // Disable authentication for all endpoints
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
